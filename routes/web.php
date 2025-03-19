@@ -19,6 +19,7 @@ use App\Http\Controllers\Frontend\ProductController;
 use App\Http\Controllers\Frontend\WishlistController;
 use App\Http\Controllers\Frontend\NewsletterController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\Admin\BannerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -134,4 +135,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     
     // Product management routes
     Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
+
+    // Banner routes
+    Route::resource('banners', BannerController::class);
+    Route::post('banners/update-positions', [BannerController::class, 'updatePositions'])->name('banners.update-positions');
+    Route::patch('banners/{banner}/toggle-active', [BannerController::class, 'toggleActive'])->name('banners.toggle-active');
 });

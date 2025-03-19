@@ -8,6 +8,7 @@ use App\Models\Book;
 use App\Models\Category;
 use App\Models\Author;
 use App\Models\Product;
+use App\Models\Banner;
 
 class HomeController extends Controller
 {
@@ -16,6 +17,12 @@ class HomeController extends Controller
      */
     public function index()
     {
+        // Get banners by types
+        $mainSliderBanners = Banner::mainSlider()->get();
+        $rightTopBanner = Banner::rightTop()->first();
+        $rightBottomBanner = Banner::rightBottom()->first();
+        $bottomBanners = Banner::bottom()->get();
+        
         // Get latest books
         $newReleases = Book::where('status', true)
             ->orderBy('created_at', 'desc')
@@ -39,7 +46,16 @@ class HomeController extends Controller
             ->take(8)
             ->get();
         
-        return view('frontend.home', compact('newReleases', 'rootCategories', 'authors', 'products'));
+        return view('frontend.home', compact(
+            'newReleases', 
+            'rootCategories', 
+            'authors', 
+            'products', 
+            'mainSliderBanners', 
+            'rightTopBanner', 
+            'rightBottomBanner', 
+            'bottomBanners'
+        ));
     }
     
     /**

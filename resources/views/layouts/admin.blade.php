@@ -145,6 +145,12 @@
                         <i class="fas fa-book"></i> Quản lý sách
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.products.index', ['category' => 'toys']) }}" class="nav-link {{ request()->routeIs('admin.products.*') && request('category') == 'toys' ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-gamepad"></i>
+                        Quản lý đồ chơi & dụng cụ học tập
+                    </a>
+                </li>
                 <li class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.categories.index') }}">
                         <i class="fas fa-list"></i> Quản lý danh mục
@@ -187,18 +193,8 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item">
-                    <a href="{{ route('admin.products.index', ['category' => 'toys']) }}" class="nav-link {{ request()->routeIs('admin.products.*') && request('category') == 'toys' ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-gamepad"></i>
-                        <p>Quản lý đồ chơi</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('admin.products.index', ['category' => 'stationery']) }}" class="nav-link {{ request()->routeIs('admin.products.*') && request('category') == 'stationery' ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-pencil-alt"></i>
-                        <p>Quản lý dụng cụ học tập</p>
-                    </a>
-                </li>
+            
+              
             </ul>
         </nav>
 

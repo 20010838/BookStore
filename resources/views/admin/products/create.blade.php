@@ -80,7 +80,7 @@
                                     @error('image')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    <small class="form-text text-muted">Chọn ảnh chính cho sản phẩm (tối đa 2MB)</small>
+                                    <small class="form-text text-muted">Chọn ảnh chính cho sản phẩm (tối đa 10MB)</small>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -90,7 +90,7 @@
                                     @error('images.*')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    <small class="form-text text-muted">Chọn nhiều ảnh cho sản phẩm (tối đa 2MB mỗi ảnh)</small>
+                                    <small class="form-text text-muted">Chọn nhiều ảnh cho sản phẩm (tối đa 10MB mỗi ảnh)</small>
                                 </div>
                             </div>
                         </div>

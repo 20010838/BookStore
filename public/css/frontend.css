@@ -1,8 +1,40 @@
 /* Custom CSS for Frontend */
 
+/* Fahasa inspired design - Variable colors */
+:root {
+    --primary-color: #F5831F;
+    --secondary-color: #E64D3D;
+    --accent-color: #009FE3;
+    --light-gray: #f1f5f9;
+    --dark-gray: #2c3e50;
+    --border-color: #e2e8f0;
+    --white: #ffffff;
+    --text-color: #333333;
+    --success-color: #2ecc71;
+    --warning-color: #f1c40f;
+    --danger-color: #e74c3c;
+    --info-color: #3498db;
+}
+
+/* Typography update */
 body {
-    font-family: 'Roboto', sans-serif;
-    color: #333;
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-color);
+    background-color: #f4f6f9;
+    font-size: 16px;
+    line-height: 1.6;
+    letter-spacing: 0.3px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    letter-spacing: 0.5px;
+}
+
+p, span, a, li, button, input, select, textarea {
+    font-family: 'Open Sans', sans-serif;
 }
 
 /* Header Styles */
@@ -12,6 +44,10 @@ body {
 
 .navbar-brand img {
     max-height: 50px;
+}
+
+.navbar-dark {
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
 }
 
 /* Hero Section */
@@ -31,7 +67,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.4);
+    background: linear-gradient(45deg, rgba(230, 77, 61, 0.7), rgba(245, 131, 31, 0.7));
 }
 
 .hero-content {
@@ -51,77 +87,358 @@ body {
 }
 
 .book-cover {
-    height: 250px;
-    object-fit: cover;
+    height: 220px;
+    object-fit: contain;
+    margin: 10px auto;
+    display: block;
+    max-width: 100%;
 }
 
 .book-title {
     font-weight: 500;
-    margin-top: 1rem;
+    margin-top: 0.8rem;
     margin-bottom: 0.5rem;
-    font-size: 1.1rem;
-    height: 2.4rem;
+    font-size: 1rem;
+    height: 2.2rem;
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.5px;
 }
 
 .book-author {
     color: #666;
     font-size: 0.9rem;
     margin-bottom: 0.5rem;
+    font-family: 'Open Sans', sans-serif;
+    font-style: italic;
 }
 
 .book-price {
     font-weight: 700;
-    color: #dc3545;
+    color: var(--secondary-color);
+    font-size: 1.2rem;
     margin-bottom: 1rem;
 }
 
-/* Category Card */
-.category-card {
+/* Section Headers - Fahasa style */
+.section-heading {
     position: relative;
+    margin-bottom: 2rem;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+.section-heading:after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    margin: 10px auto 0;
+}
+
+/* Product Card Redesign - Fahasa style */
+.product-card {
+    transition: all 0.3s ease;
+    height: 100%;
+    border-radius: 10px;
     overflow: hidden;
-    border-radius: 0.5rem;
-    height: 150px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    background-color: var(--white);
+    position: relative;
+}
+
+.product-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+    border-color: #e5e8eb;
+}
+
+.product-card .card-img-container {
+    height: 210px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 15px;
+    background-color: #fff;
+    position: relative;
+}
+
+.product-card .card-img-top {
+    height: 250px;
+    object-fit: contain;
+    padding: 15px;
+    background-color: #fff;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.product-card .card-body {
+    padding: 1rem 1.2rem;
+    background-color: var(--white);
+    display: flex;
+    flex-direction: column;
+}
+
+.product-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 0.6rem;
+    height: 2.75rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    color: #333;
+    line-height: 1.4;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.product-title a {
+    color: #333;
+    text-decoration: none;
+}
+
+.product-title a:hover {
+    color: var(--primary-color);
+}
+
+.product-author {
+    color: #666;
+    font-size: 1rem;
+    margin-bottom: 0.6rem;
+    font-family: 'Open Sans', sans-serif;
+    font-style: italic;
+}
+
+.product-author a {
+    color: #666;
+    text-decoration: none;
+}
+
+.product-author a:hover {
+    color: var(--primary-color);
+}
+
+.product-price {
+    font-weight: 700;
+    color: var(--secondary-color);
+    font-size: 1.2rem;
+    margin-top: auto;
+}
+
+/* Badge styling update */
+.product-card .badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 2;
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+    font-size: 0.8rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+/* Action buttons redesign */
+.product-card .action-buttons {
+    position: absolute;
+    top: 160px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 3;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.3s ease;
+}
+
+.product-card:hover .action-buttons {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.product-card .action-btn {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: white;
+    color: var(--primary-color);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.product-card .action-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: scale(1.05);
+}
+
+.product-card .btn-details {
+    width: 100%;
+    font-size: 0.9rem;
+    padding: 0.4rem 0;
+    border-radius: 4px;
+    margin-top: 0.8rem;
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    border: none;
+    color: white;
+    transition: all 0.3s;
+}
+
+.product-card .btn-details:hover {
+    background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Rating stars styling */
+.product-card .rating {
+    margin-bottom: 0.6rem;
+    color: #ffc107;
+    font-size: 0.8rem;
+}
+
+/* Responsive adjustments for product cards */
+@media (max-width: 767.98px) {
+    .product-card .card-img-container {
+        height: 180px;
+    }
+    
+    .product-card .card-img-top {
+        max-height: 150px;
+    }
+    
+    .product-card .action-buttons {
+        top: 130px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .product-card .card-img-container {
+        height: 160px;
+    }
+    
+    .product-card .card-img-top {
+        max-height: 130px;
+    }
+    
+    .product-card .action-buttons {
+        top: 110px;
+    }
+    
+    .product-card .card-body {
+        padding: 0.8rem;
+    }
+}
+
+/* Category cards - Fahasa style */
+.category-card {
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
 }
 
 .category-card:hover {
-    transform: scale(1.03);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 
 .category-card img {
     width: 100%;
-    height: 100%;
+    height: 150px;
     object-fit: cover;
+    transition: all 0.5s ease;
+}
+
+.category-card:hover img {
+    transform: scale(1.1);
 }
 
 .category-overlay {
     position: absolute;
-    top: 0;
+    bottom: 0;
     left: 0;
     width: 100%;
-    height: 100%;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.7));
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 15px;
+    background: linear-gradient(to top, rgba(var(--dark-gray), 0.8), rgba(var(--dark-gray), 0));
 }
 
 .category-name {
     color: white;
     font-weight: 600;
-    font-size: 1.2rem;
-    text-align: center;
+    font-size: 1.1rem;
+    margin: 0;
 }
 
-/* Features Section */
-.feature-icon {
-    font-size: 2.5rem;
-    color: #007bff;
-    margin-bottom: 1rem;
+/* Filter card - Fahasa style */
+.filter-card {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+    border: none;
+}
+
+.filter-card .card-header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+}
+
+.filter-card .card-body {
+    padding: 1rem;
+}
+
+.filter-card h6 {
+    font-size: 1rem;
+    margin-bottom: 0.7rem;
+    text-transform: uppercase;
+    color: var(--dark-gray);
+    font-weight: 600;
+}
+
+.filter-card .form-check-label {
+    font-size: 0.95rem;
+}
+
+.filter-card .accordion-button {
+    font-size: 0.95rem;
+    padding: 0.5rem 0.7rem;
+}
+
+.filter-card .form-select {
+    font-size: 0.95rem;
 }
 
 /* Newsletter Section */
@@ -132,8 +449,9 @@ body {
 
 /* Footer */
 footer {
-    background-color: #343a40;
+    background: linear-gradient(to right, var(--dark-gray), #1a252f);
     color: #fff;
+    font-size: 1rem;
 }
 
 footer a {
@@ -165,21 +483,21 @@ footer a:hover {
 .book-detail-price {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #dc3545;
+    color: var(--secondary-color);
     margin-bottom: 1rem;
 }
 
 .book-detail-info {
     margin-top: 2rem;
+    font-size: 1rem;
 }
 
 .book-detail-info table {
     width: 100%;
 }
 
-.book-detail-info th {
-    width: 30%;
-    font-weight: 500;
+.book-detail-info th, .book-detail-info td {
+    padding: 0.6rem;
 }
 
 /* Reviews */
@@ -191,7 +509,7 @@ footer a:hover {
 }
 
 .star-rating .fas {
-    color: #ffc107;
+    color: var(--warning-color);
 }
 
 .star-rating .far {
@@ -218,6 +536,17 @@ footer a:hover {
     .book-cover {
         height: 200px;
     }
+    body {
+        font-size: 15px;
+    }
+    
+    .product-title {
+        font-size: 1rem;
+    }
+    
+    .section-heading {
+        font-size: 1.7rem;
+    }
 }
 
 @media (max-width: 575.98px) {
@@ -228,4 +557,394 @@ footer a:hover {
     .hero-content h1 {
         font-size: 1.8rem;
     }
+    .product-title {
+        font-size: 0.95rem;
+        height: 2.5rem;
+    }
+    
+    .product-author {
+        font-size: 0.9rem;
+    }
+}
+
+/* Filter styles */
+.filter-card {
+    overflow: hidden;
+}
+
+.filter-card .card-header h5 {
+    font-size: 1rem;
+}
+
+.filter-card h6 {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.filter-card .form-check-label {
+    font-size: 0.85rem;
+}
+
+.filter-card .accordion-button {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+}
+
+.filter-card .category-accordion .accordion-button {
+    padding: 0.2rem;
+}
+
+.filter-card .category-accordion .form-check {
+    margin-top: 0.15rem;
+    margin-bottom: 0.15rem;
+}
+
+/* Bộ lọc danh mục phần radio buttons */
+.filter-card .form-check-input {
+    margin-top: 0.2rem;
+}
+
+.danh-muc-item {
+    font-size: 0.85rem;
+}
+
+/* Responsive adjustments for filter card */
+@media (max-width: 991.98px) {
+    .filter-card .card-body {
+        max-height: none;
+        overflow-y: visible;
+    }
+}
+
+/* End filter styles */
+
+/* Product Card Styles */
+.product-card {
+    transition: all 0.3s ease;
+    height: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    border: none;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.product-card .card-img-top {
+    height: 250px;
+    object-fit: contain;
+    padding: 15px;
+    background-color: #fff;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.product-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    height: 2.5rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.product-author {
+    color: #666;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.product-price {
+    font-weight: 700;
+    color: var(--secondary-color);
+    font-size: 0.95rem;
+}
+
+/* Section Headings */
+.section-heading {
+    position: relative;
+    margin-bottom: 2rem;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.section-heading:after {
+    content: '';
+    display: block;
+    width: 100px;
+    height: 3px;
+    background: var(--primary-color);
+    margin: 10px auto 0;
+}
+
+/* Product Tabs */
+.product-tab-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1.5rem;
+}
+
+.product-tab-btn {
+    padding: 0.5rem 1.5rem;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    background-color: #f8f9fa;
+    color: #333;
+    margin-left: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.product-tab-btn:hover, 
+.product-tab-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Action buttons for products */
+.product-card .action-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.product-card:hover .action-btn {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.product-card .action-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: scale(1.05);
+}
+
+/* Chi tiết button */
+.btn-details {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+}
+
+/* Product title and description typography improvements */
+.product-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 0.7rem;
+    height: 2.75rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.product-author {
+    color: #666;
+    font-size: 1rem;
+    margin-bottom: 0.7rem;
+}
+
+.product-price {
+    font-weight: 700;
+    color: var(--secondary-color);
+    font-size: 1.2rem;
+}
+
+/* Filter card typography improvements */
+.filter-card h6 {
+    font-size: 1rem;
+    margin-bottom: 0.7rem;
+    text-transform: uppercase;
+    color: var(--dark-gray);
+    font-weight: 600;
+}
+
+.filter-card .form-check-label {
+    font-size: 0.95rem;
+}
+
+.filter-card .accordion-button {
+    font-size: 0.95rem;
+    padding: 0.5rem 0.7rem;
+}
+
+/* Badge styling improvements */
+.badge {
+    font-weight: 500;
+    padding: 0.4em 0.75em;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+/* Button typography improvements */
+.btn {
+    font-size: 0.95rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.btn-sm {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.75rem;
+}
+
+/* Tab buttons improvements */
+.product-tab-btn {
+    padding: 0.6rem 1.7rem;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: 500;
+    background-color: #f8f9fa;
+    color: var(--text-color);
+    margin: 0 0.5rem;
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+}
+
+/* Form controls typography improvements */
+.form-select, .form-control {
+    font-size: 0.95rem;
+}
+
+/* Breadcrumb improvements */
+.breadcrumb {
+    font-size: 0.95rem;
+}
+
+/* Section heading improvements */
+.section-heading {
+    position: relative;
+    margin-bottom: 2.5rem;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    padding-bottom: 10px;
+}
+
+.section-heading:after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 3px;
+    background: var(--primary-color);
+    margin: 10px auto 0;
+}
+
+/* Filter subcategory improvements */
+.subcategory-item .form-check-label {
+    font-size: 0.95rem;
+}
+
+.grandchild-category .form-check-label {
+    font-size: 0.9rem;
+}
+
+/* Search results header text */
+h4.mb-2.fw-bold {
+    font-size: 1.35rem;
+}
+
+/* Dropdown menu items */
+.dropdown-item {
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+}
+
+/* Text in book detail sections */
+.book-detail-info {
+    font-size: 1rem;
+}
+
+.book-detail-info th, .book-detail-info td {
+    padding: 0.6rem;
+}
+
+/* Footer text */
+footer {
+    font-size: 1rem;
+}
+
+.category-item.active {
+    background-color: rgba(245, 131, 31, 0.1);
+    border-color: rgba(245, 131, 31, 0.3);
+}
+
+/* Hiệu ứng hover cho sản phẩm */
+.product-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover::before {
+    transform: scaleX(1);
+}
+
+/* Nút gradient cho Chi tiết */
+.product-card .btn-details {
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    border: none;
+    color: white;
+    transition: all 0.3s;
+}
+
+.product-card .btn-details:hover {
+    background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Thanh search */
+.search-box {
+    border: 2px solid var(--primary-color);
+    border-radius: 30px;
+    overflow: hidden;
+}
+
+.search-box .btn-search {
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    border: none;
+    color: white;
+}
+
+/* Button typography improvements */
+.btn-primary {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background: var(--secondary-color);
+    border-color: var(--secondary-color);
 } 

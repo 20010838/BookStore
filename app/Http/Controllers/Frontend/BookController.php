@@ -120,6 +120,10 @@ class BookController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
         
+        // Tải thêm images và gán cho gallery
+        $book->load('images');
+        $book->gallery = $book->images;
+        
         return view('frontend.books.show', compact('book', 'relatedBooks', 'reviews'));
     }
     

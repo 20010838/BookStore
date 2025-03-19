@@ -148,7 +148,7 @@
         <div class="col-lg-3 col-md-4">
             <div class="card filter-card sticky-md-top" style="top: 20px; z-index: 1000;">
                 <div class="card-header filter-header">
-                    <h5 class="mb-0 fw-bold">Bộ lọc</h5>
+                    <h5 class="mb-0 fw-bold">Bộ lọc1</h5>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('products.index') }}" method="GET">
@@ -269,29 +269,45 @@
             <div class="row g-4">
                 @forelse($products as $product)
                 <div class="col-lg-4 col-md-6">
-                    <div class="card h-100 product-card">
-                        <div class="position-relative">
-                            <img src="{{ Storage::url($product->image) }}" class="card-img-top product-img" alt="{{ $product->name }}">
-                            @if($product->stock <= 0)
-                            <div class="position-absolute top-0 start-0 w-100 h-100 bg-danger bg-opacity-50 d-flex align-items-center justify-content-center">
-                                <span class="text-white fw-bold">Hết hàng</span>
+                    <div class="product-card">
+                        @if($product->created_at && $product->created_at->diffInDays(now()) < 30)
+                            <span class="badge bg-danger">Mới</span>
+                        @endif
+                        
+                        <div class="card-img-container">
+                            <a href="{{ route('products.show', $product->slug) }}">
+                                <img src="{{ Storage::url($product->image) }}" class="card-img-top" alt="{{ $product->name }}">
+                            </a>
+                            
+                            <div class="action-buttons">
+                                <button class="action-btn add-to-wishlist" data-bs-toggle="tooltip" title="Thêm vào danh sách yêu thích">
+                                    <i class="fa-regular fa-heart"></i>
+                                </button>
                             </div>
-                            @endif
                         </div>
-                        <div class="card-body d-flex flex-column">
-                            @if($product->category)
-                                <span class="category-badge mb-2">{{ $product->category->name }}</span>
-                            @endif
-                            <h5 class="card-title">{{ $product->name }}</h5>
-                            <p class="card-text flex-grow-1">{{ Str::limit($product->description, 80) }}</p>
-                            <div class="d-flex justify-content-between align-items-center mt-3">
-                                <span class="price-tag">{{ number_format($product->price) }} ₫</span>
-                                @if($product->stock > 0)
-                                <a href="{{ route('products.show', $product->slug) }}" class="btn btn-primary detail-btn">Chi tiết</a>
-                                @else
-                                <button class="btn btn-secondary detail-btn" disabled>Hết hàng</button>
-                                @endif
+                        
+                        <div class="card-body">
+                            <h5 class="product-title">
+                                <a href="{{ route('products.show', $product->slug) }}">{{ Str::limit($product->name, 40) }}</a>
+                            </h5>
+                            
+                            <div class="product-author">
+                                {{ $product->brand ?? 'Thương hiệu tốt' }}
                             </div>
+                            
+                            <div class="rating">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= round($product->ratings_avg_rating ?? 0))
+                                        <i class="fas fa-star"></i>
+                                    @else
+                                        <i class="far fa-star"></i>
+                                    @endif
+                                @endfor
+                            </div>
+                            
+                            <div class="product-price">{{ number_format($product->price, 0, ',', '.') }}đ</div>
+                            
+                            <a href="{{ route('products.show', $product->slug) }}" class="btn btn-details">Chi tiết</a>
                         </div>
                     </div>
                 </div>

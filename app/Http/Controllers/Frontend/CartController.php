@@ -134,11 +134,20 @@ class CartController extends Controller
             ->where('user_id', Auth::id())
             ->firstOrFail();
         
-        $book = Book::findOrFail($cartItem->book_id);
-        
-        // Check if requested quantity exceeds stock
-        if ($request->quantity > $book->stock) {
-            return redirect()->back()->with('error', 'Số lượng sách trong kho không đủ.');
+        if ($cartItem->book_id) {
+            $book = Book::findOrFail($cartItem->book_id);
+            
+            // Check if requested quantity exceeds stock
+            if ($request->quantity > $book->stock) {
+                return redirect()->back()->with('error', 'Số lượng sách trong kho không đủ.');
+            }
+        } elseif ($cartItem->product_id) {
+            $product = Product::findOrFail($cartItem->product_id);
+            
+            // Check if requested quantity exceeds stock
+            if ($request->quantity > $product->stock) {
+                return redirect()->back()->with('error', 'Số lượng sản phẩm trong kho không đủ.');
+            }
         }
         
         $cartItem->quantity = $request->quantity;

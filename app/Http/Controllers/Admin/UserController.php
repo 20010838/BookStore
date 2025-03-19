@@ -7,7 +7,6 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -16,7 +15,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::with('roles')->paginate(10);
+        $users = User::paginate(10);
         return view('admin.users.index', compact('users'));
     }
 
@@ -25,7 +24,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        $roles = Role::all();
+        $roles = ['admin', 'user']; // Các vai trò có sẵn
         return view('admin.users.create', compact('roles'));
     }
 
@@ -38,20 +37,15 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'roles' => 'nullable|array',
-            'roles.*' => 'exists:roles,id',
+            'role' => 'required|in:admin,user',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => $request->role,
         ]);
-
-        if ($request->has('roles')) {
-            $roles = Role::whereIn('id', $request->roles)->get();
-            $user->syncRoles($roles);
-        }
 
         return redirect()->route('admin.users.index')->with('success', 'Người dùng đã được tạo thành công.');
     }
@@ -61,7 +55,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $user = User::with(['roles', 'orders', 'reviews'])->findOrFail($id);
+        $user = User::with(['orders', 'reviews'])->findOrFail($id);
         return view('admin.users.show', compact('user'));
     }
 
@@ -70,8 +64,8 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        $user = User::with('roles')->findOrFail($id);
-        $roles = Role::all();
+        $user = User::findOrFail($id);
+        $roles = ['admin', 'user']; // Các vai trò có sẵn
         return view('admin.users.edit', compact('user', 'roles'));
     }
 
@@ -92,13 +86,13 @@ class UserController extends Controller
                 Rule::unique('users')->ignore($user->id),
             ],
             'password' => 'nullable|string|min:8|confirmed',
-            'roles' => 'nullable|array',
-            'roles.*' => 'exists:roles,id',
+            'role' => 'required|in:admin,user',
         ]);
 
         $data = [
             'name' => $request->name,
             'email' => $request->email,
+            'role' => $request->role,
         ];
 
         if ($request->filled('password')) {
@@ -106,13 +100,6 @@ class UserController extends Controller
         }
 
         $user->update($data);
-
-        if ($request->has('roles')) {
-            $roles = Role::whereIn('id', $request->roles)->get();
-            $user->syncRoles($roles);
-        } else {
-            $user->syncRoles([]);
-        }
 
         return redirect()->route('admin.users.index')->with('success', 'Người dùng đã được cập nhật thành công.');
     }

@@ -76,7 +76,7 @@ class Book extends Model
     /**
      * Get all images for the book
      */
-    public function images(): HasMany
+    public function images()
     {
         return $this->hasMany(BookImage::class);
     }

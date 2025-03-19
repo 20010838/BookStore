@@ -90,23 +90,26 @@
     </div>
 </section>
 
-<!-- Categories Section -->
+<!-- Categories Section - Fahasa Style -->
 <section class="py-5 bg-light">
     <div class="container">
+        <h2 class="section-heading">Danh mục nổi bật</h2>
+        
         <div class="row mb-4">
-            <div class="col-md-8">
-                <h2 class="section-title">Danh mục nổi bật</h2>
+            <div class="col-md-9">
                 <p class="text-muted">Khám phá sách theo danh mục yêu thích của bạn</p>
             </div>
-            <div class="col-md-4 text-md-end">
-                <a href="{{ route('books.index') }}" class="btn btn-outline-primary">Xem tất cả</a>
+            <div class="col-md-3 text-md-end">
+                <a href="{{ route('books.index') }}" class="btn btn-outline-primary rounded-pill">
+                    <i class="fas fa-list me-1"></i> Xem tất cả
+                </a>
             </div>
         </div>
         
         <div class="row">
             @foreach($rootCategories as $rootCategory)
                 <div class="col-md-4 col-sm-6 mb-4">
-                    <div class="card h-100 shadow-sm">
+                    <div class="card h-100 shadow-sm border-0">
                         <div class="card-header bg-primary text-white">
                             <h5 class="mb-0">
                                 <a href="{{ route('books.by_category', $rootCategory->slug) }}" class="text-white text-decoration-none">
@@ -118,9 +121,9 @@
                             @if($rootCategory->children && $rootCategory->children->count() > 0)
                                 <ul class="list-group list-group-flush">
                                     @foreach($rootCategory->children->take(4) as $childCategory)
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            <a href="{{ route('books.by_category', $childCategory->slug) }}" class="text-decoration-none">
-                                                {{ $childCategory->name }}
+                                        <li class="list-group-item border-0 py-2 d-flex justify-content-between align-items-center">
+                                            <a href="{{ route('books.by_category', $childCategory->slug) }}" class="text-decoration-none text-dark">
+                                                <i class="fas fa-chevron-right text-primary me-2 small"></i>{{ $childCategory->name }}
                                             </a>
                                             @if($childCategory->children && $childCategory->children->count() > 0)
                                                 <span class="badge bg-primary rounded-pill">{{ $childCategory->children->count() }}</span>
@@ -130,8 +133,8 @@
                                 </ul>
                                 @if($rootCategory->children->count() > 4)
                                     <div class="text-center mt-3">
-                                        <a href="{{ route('books.by_category', $rootCategory->slug) }}" class="btn btn-sm btn-outline-primary">
-                                            Xem thêm
+                                        <a href="{{ route('books.by_category', $rootCategory->slug) }}" class="btn btn-sm btn-outline-primary rounded-pill">
+                                            <i class="fas fa-plus-circle me-1"></i> Xem thêm
                                         </a>
                                     </div>
                                 @endif
@@ -146,61 +149,72 @@
     </div>
 </section>
 
-<!-- New Releases Section -->
+<!-- New Releases Section - Fahasa Style -->
 <section class="py-5">
     <div class="container">
-        <div class="row mb-4">
-            <div class="col-md-8">
-                <h2 class="section-title">Sản phẩm mới</h2>
-                <p class="text-muted">Sách, đồ chơi và dụng cụ học tập mới nhất</p>
-            </div>
-            <div class="col-md-4 text-md-end">
-                <div class="btn-group" role="group">
-                    <a href="{{ route('books.index') }}?sort=newest" class="btn btn-outline-primary">Sách mới</a>
-                    <a href="{{ route('products.index') }}" class="btn btn-outline-primary">Đồ chơi & Học cụ</a>
-                </div>
-            </div>
+        <h2 class="section-heading">Sản phẩm mới</h2>
+        
+        <div class="product-tab-buttons">
+            <a href="{{ route('books.index') }}?sort=newest" class="product-tab-btn {{ !request()->is('products*') ? 'active' : '' }}">
+                <i class="fas fa-book me-1"></i> Sách mới
+            </a>
+            <a href="{{ route('products.index') }}" class="product-tab-btn {{ request()->is('products*') ? 'active' : '' }}">
+                <i class="fas fa-puzzle-piece me-1"></i> Đồ chơi & Học cụ
+            </a>
         </div>
         
         <div class="row">
             <!-- Hiển thị sách mới -->
             @foreach($newReleases->take(4) as $book)
                 <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card book-card h-100 shadow-sm">
-                        <a href="{{ route('books.show', $book->slug) }}">
-                            <img src="{{ $book->cover_image ?  asset('storage/' . $book->cover_image)  : asset('images/book-placeholder.jpg') }}" 
-                                 class="card-img-top book-cover" alt="{{ $book->title }}">
-                        </a>
-                        <div class="card-body">
-                            <span class="badge bg-primary mb-2">Sách</span>
-                            <h5 class="book-title">
-                                <a href="{{ route('books.show', $book->slug) }}" class="text-decoration-none text-dark">
-                                    {{ $book->title }}
-                                </a>
-                            </h5>
-                            <p class="book-author">
-                                <a href="{{ route('books.by_author', $book->author->slug) }}" class="text-decoration-none text-muted">
-                                    {{ $book->author->name }}
-                                </a>
-                            </p>
-                            <p class="book-price">{{ number_format($book->price) }} đ</p>
-                            <div class="d-flex justify-content-between">
-                                <a href="{{ route('books.show', $book->slug) }}" class="btn btn-sm btn-outline-primary">
-                                    Chi tiết
-                                </a>
-                                @if($book->stock > 0)
-                                    <form action="{{ route('cart.add') }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="book_id" value="{{ $book->id }}">
-                                        <input type="hidden" name="quantity" value="1">
-                                        <button type="submit" class="btn btn-sm btn-primary">
-                                            <i class="fas fa-cart-plus"></i> Thêm vào giỏ
-                                        </button>
-                                    </form>
-                                @else
-                                    <span class="badge bg-danger">Hết hàng</span>
-                                @endif
+                    <div class="product-card">
+                        @if($book->publication_date && $book->publication_date->diffInDays(now()) < 30)
+                            <span class="badge bg-danger">Mới</span>
+                        @endif
+                        
+                        <div class="card-img-container">
+                            <a href="{{ route('books.show', $book->slug) }}">
+                                <img src="{{ $book->cover_image ? asset('storage/' . $book->cover_image) : asset('images/book-placeholder.jpg') }}" 
+                                     class="card-img-top" alt="{{ $book->title }}">
+                            </a>
+                            
+                            <div class="action-buttons">
+                                <button class="action-btn add-to-wishlist" data-bs-toggle="tooltip" title="Thêm vào danh sách yêu thích">
+                                    <i class="fa-regular fa-heart"></i>
+                                </button>
+                                <!-- <form action="{{ route('cart.add') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="book_id" value="{{ $book->id }}">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="action-btn add-to-cart" data-bs-toggle="tooltip" title="Thêm vào giỏ hàng">
+                                        <i class="fa-solid fa-cart-plus"></i>
+                                    </button>
+                                </form> -->
                             </div>
+                        </div>
+                        
+                        <div class="card-body">
+                            <h5 class="product-title">
+                                <a href="{{ route('books.show', $book->slug) }}">{{ $book->title }}</a>
+                            </h5>
+                            
+                            <div class="product-author">
+                                <a href="{{ route('books.by_author', $book->author->id) }}">{{ $book->author->name }}</a>
+                            </div>
+                            
+                            <div class="rating">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= round($book->ratings_avg_rating ?? 0))
+                                        <i class="fas fa-star"></i>
+                                    @else
+                                        <i class="far fa-star"></i>
+                                    @endif
+                                @endfor
+                            </div>
+                            
+                            <div class="product-price">{{ number_format($book->price, 0, ',', '.') }}đ</div>
+                            
+                            <a href="{{ route('books.show', $book->slug) }}" class="btn btn-details">Chi tiết</a>
                         </div>
                     </div>
                 </div>
@@ -210,45 +224,46 @@
             @if(isset($products) && $products->count() > 0)
                 @foreach($products->take(4) as $product)
                     <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                        <div class="card book-card h-100 shadow-sm">
-                            <a href="{{ route('products.show', $product->slug) }}">
-                                <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('images/product-placeholder.jpg') }}" 
-                                     class="card-img-top book-cover" alt="{{ $product->name }}">
-                            </a>
-                            <div class="card-body">
-                                <span class="badge bg-success mb-2">
-                                    @if($product->category)
-                                        {{ $product->category->name }}
-                                    @else
-                                        Sản phẩm
-                                    @endif
-                                </span>
-                                <h5 class="book-title">
-                                    <a href="{{ route('products.show', $product->slug) }}" class="text-decoration-none text-dark">
-                                        {{ $product->name }}
-                                    </a>
-                                </h5>
-                                <p class="text-muted mb-2">
-                                    {{ $product->brand ?? 'Thương hiệu tốt' }}
-                                </p>
-                                <p class="book-price">{{ number_format($product->price) }} đ</p>
-                                <div class="d-flex justify-content-between">
-                                    <a href="{{ route('products.show', $product->slug) }}" class="btn btn-sm btn-outline-primary">
-                                        Chi tiết
-                                    </a>
-                                    @if($product->stock > 0)
-                                        <form action="{{ route('cart.add') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                            <input type="hidden" name="quantity" value="1">
-                                            <button type="submit" class="btn btn-sm btn-primary">
-                                                <i class="fas fa-cart-plus"></i> Thêm vào giỏ
-                                            </button>
-                                        </form>
-                                    @else
-                                        <span class="badge bg-danger">Hết hàng</span>
-                                    @endif
+                        <div class="product-card">
+                            @if($product->created_at && $product->created_at->diffInDays(now()) < 30)
+                                <span class="badge bg-danger">Mới</span>
+                            @endif
+                            
+                            <div class="card-img-container">
+                                <a href="{{ route('products.show', $product->slug) }}">
+                                    <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('images/product-placeholder.jpg') }}" 
+                                         class="card-img-top" alt="{{ $product->name }}">
+                                </a>
+                                
+                                <div class="action-buttons">
+                                    <button class="action-btn add-to-wishlist" data-bs-toggle="tooltip" title="Thêm vào danh sách yêu thích">
+                                        <i class="fa-regular fa-heart"></i>
+                                    </button>
                                 </div>
+                            </div>
+                            
+                            <div class="card-body">
+                                <h5 class="product-title">
+                                    <a href="{{ route('products.show', $product->slug) }}">{{ $product->name }}</a>
+                                </h5>
+                                
+                                <div class="product-author">
+                                    {{ $product->brand ?? 'Thương hiệu tốt' }}
+                                </div>
+                                
+                                <div class="rating">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($i <= round($product->ratings_avg_rating ?? 0))
+                                            <i class="fas fa-star"></i>
+                                        @else
+                                            <i class="far fa-star"></i>
+                                        @endif
+                                    @endfor
+                                </div>
+                                
+                                <div class="product-price">{{ number_format($product->price, 0, ',', '.') }}đ</div>
+                                
+                                <a href="{{ route('products.show', $product->slug) }}" class="btn btn-details">Chi tiết</a>
                             </div>
                         </div>
                     </div>

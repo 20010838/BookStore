@@ -16,6 +16,9 @@ use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Frontend\ProductController;
+use App\Http\Controllers\Frontend\WishlistController;
+use App\Http\Controllers\Frontend\NewsletterController;
+use App\Http\Controllers\GalleryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,12 +52,25 @@ Route::get('/books/{slug}', [BookController::class, 'show'])->name('books.show')
 Route::get('/category/{slug}', [BookController::class, 'byCategory'])->name('books.by_category');
 Route::get('/author/{slug}', [BookController::class, 'byAuthor'])->name('books.by_author');
 
+// Gallery Routes
+Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
+Route::get('/gallery/{id}', [GalleryController::class, 'show'])->name('gallery.show');
+
 // Cart Routes
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::patch('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
 Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+
+// Wishlist Routes
+Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
+Route::post('/wishlist/add', [WishlistController::class, 'add'])->name('wishlist.add');
+Route::delete('/wishlist/remove/{id}', [WishlistController::class, 'remove'])->name('wishlist.remove');
+Route::delete('/wishlist/clear', [WishlistController::class, 'clear'])->name('wishlist.clear');
+
+// Newsletter Routes
+Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 
 // Authenticated User Routes
 Route::middleware(['auth'])->group(function () {
@@ -75,7 +91,6 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [UserController::class, 'updateProfile'])->name('user.update_profile');
     Route::get('/change-password', [UserController::class, 'showChangePasswordForm'])->name('user.change_password');
     Route::patch('/change-password', [UserController::class, 'changePassword'])->name('user.update_password');
-    Route::get('/wishlist', [UserController::class, 'wishlist'])->name('user.wishlist');
     Route::get('/my-reviews', [UserController::class, 'reviews'])->name('user.reviews');
 });
 

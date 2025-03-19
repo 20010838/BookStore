@@ -5,46 +5,38 @@
     <div class="row">
         <!-- Product Images -->
         <div class="col-md-6">
-            <div class="card">
-                <div class="card-body p-0">
-                    <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
-                        <div class="carousel-inner">
-                            <div class="carousel-item active">
-                                <img src="{{ Storage::url($product->image) }}" class="d-block w-100" alt="{{ $product->name }}">
+            <div class="product-gallery">
+                <!-- Main Image with Lightbox -->
+                <div class="main-image-container mb-3">
+                    <a href="{{ Storage::url($product->image) }}" data-lightbox="product-gallery" data-title="{{ $product->name }}">
+                        <img src="{{ Storage::url($product->image) }}" class="img-fluid main-image" alt="{{ $product->name }}">
+                        <div class="zoom-overlay">
+                            <i class="fas fa-search-plus"></i>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Thumbnails Gallery -->
+                <div class="thumbnails-container">
+                    <div class="swiper-container thumbnail-swiper">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide thumbnail-item active" data-index="0">
+                                <img src="{{ Storage::url($product->image) }}" class="img-thumbnail" 
+                                     alt="{{ $product->name }}" data-src="{{ Storage::url($product->image) }}">
                             </div>
-                            @foreach($product->images as $image)
-                            <div class="carousel-item">
-                                <img src="{{ Storage::url($image->image_path) }}" class="d-block w-100" alt="{{ $image->caption ?? $product->name }}">
+                            @foreach($product->images as $key => $image)
+                            <div class="swiper-slide thumbnail-item" data-index="{{ $key + 1 }}">
+                                <img src="{{ Storage::url($image->image_path) }}" class="img-thumbnail" 
+                                     alt="{{ $image->caption ?? $product->name }}" data-src="{{ Storage::url($image->image_path) }}">
                             </div>
                             @endforeach
                         </div>
-                        @if($product->images->count() > 0)
-                        <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Previous</span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
-                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Next</span>
-                        </button>
-                        @endif
+                        <!-- Navigation buttons -->
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
                     </div>
                 </div>
             </div>
-
-            <!-- Thumbnail Gallery -->
-            @if($product->images->count() > 0)
-            <div class="row mt-3">
-                <div class="col-12">
-                    <div class="d-flex gap-2 overflow-auto">
-                        <img src="{{ Storage::url($product->image) }}" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;" alt="{{ $product->name }}" onclick="$('#productCarousel').carousel(0)">
-                        @foreach($product->images as $key => $image)
-                        <img src="{{ Storage::url($image->image_path) }}" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;" alt="{{ $image->caption ?? $product->name }}" onclick="$('#productCarousel').carousel({{ $key + 1 }})">
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-            @endif
         </div>
 
         <!-- Product Details -->
@@ -262,7 +254,93 @@
     @endif
 </div>
 
+@push('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightbox2@2.11.3/dist/css/lightbox.min.css">
+<style>
+    .product-gallery {
+        position: relative;
+    }
+    
+    .main-image-container {
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .main-image {
+        width: 100%;
+        height: 400px;
+        object-fit: contain;
+        background-color: #f8f9fa;
+        transition: transform 0.3s ease;
+    }
+    
+    .main-image-container:hover .main-image {
+        transform: scale(1.03);
+    }
+    
+    .zoom-overlay {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: rgba(255,255,255,0.8);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .main-image-container:hover .zoom-overlay {
+        opacity: 1;
+    }
+    
+    .thumbnail-swiper {
+        height: 100px;
+        padding: 0 30px;
+    }
+    
+    .thumbnail-item {
+        cursor: pointer;
+        opacity: 0.6;
+        transition: opacity 0.3s ease;
+    }
+    
+    .thumbnail-item.active {
+        opacity: 1;
+        border: 2px solid #007bff;
+    }
+    
+    .thumbnail-item:hover {
+        opacity: 1;
+    }
+    
+    .thumbnail-item img {
+        height: 80px;
+        width: 100%;
+        object-fit: cover;
+    }
+    
+    .swiper-button-next, .swiper-button-prev {
+        color: #007bff;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .swiper-button-next:after, .swiper-button-prev:after {
+        font-size: 20px;
+    }
+</style>
+@endpush
+
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lightbox2@2.11.3/dist/js/lightbox.min.js"></script>
 <script>
 function updateQuantity(change) {
     const input = document.getElementById('quantity');
@@ -274,6 +352,61 @@ function updateQuantity(change) {
         input.value = newValue;
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Swiper
+    const swiper = new Swiper('.thumbnail-swiper', {
+        slidesPerView: 4,
+        spaceBetween: 10,
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+        breakpoints: {
+            // when window width is >= 320px
+            320: {
+                slidesPerView: 3,
+                spaceBetween: 5
+            },
+            // when window width is >= 480px
+            480: {
+                slidesPerView: 3,
+                spaceBetween: 10
+            },
+            // when window width is >= 640px
+            640: {
+                slidesPerView: 4,
+                spaceBetween: 10
+            }
+        }
+    });
+
+    // Thumbnail click handler
+    const thumbnails = document.querySelectorAll('.thumbnail-item');
+    const mainImage = document.querySelector('.main-image');
+    const mainImageLink = document.querySelector('.main-image-container a');
+
+    thumbnails.forEach(thumbnail => {
+        thumbnail.addEventListener('click', function() {
+            // Update active state
+            thumbnails.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Update main image
+            const imgSrc = this.querySelector('img').getAttribute('data-src');
+            mainImage.src = imgSrc;
+            mainImageLink.href = imgSrc;
+        });
+    });
+
+    // Initialize Lightbox
+    lightbox.option({
+        'resizeDuration': 200,
+        'wrapAround': true,
+        'disableScrolling': true,
+        'fitImagesInViewport': true
+    });
+});
 </script>
 @endpush
 @endsection 

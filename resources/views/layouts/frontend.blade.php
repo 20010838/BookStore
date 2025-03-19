@@ -508,5 +508,8 @@
     
     <!-- Additional JS -->
     @yield('scripts')
+    
+    <!-- Stacked Scripts -->
+    @stack('scripts')
 </body>
 </html> 

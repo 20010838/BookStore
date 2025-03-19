@@ -62,4 +62,27 @@ class Product extends Model
     {
         return $this->hasMany(ProductImage::class);
     }
+    
+    /**
+     * Get the primary image for the product
+     */
+    public function getPrimaryImageAttribute()
+    {
+        return $this->images()->where('is_primary', true)->first() 
+            ?? $this->images()->first();
+    }
+    
+    /**
+     * Get the primary image path for the product
+     * Returns image field if exists, otherwise gets from product_images if exists
+     */
+    public function getPrimaryImagePathAttribute()
+    {
+        if ($this->image) {
+            return $this->image;
+        }
+        
+        $primaryImage = $this->getPrimaryImageAttribute();
+        return $primaryImage ? $primaryImage->image_path : null;
+    }
 } 

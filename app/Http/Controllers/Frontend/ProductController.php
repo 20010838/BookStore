@@ -104,8 +104,13 @@ class ProductController extends Controller
             ->inRandomOrder()
             ->take(4)
             ->get();
-
-        return view('frontend.products.show', compact('product', 'relatedProducts'));
+        
+        // Tải thêm images cho gallery
+        $product->load('images');
+            
+        return view('frontend.details', compact('product', 'relatedProducts'))
+                ->with('item', $product)
+                ->with('type', 'product');
     }
 
     public function byCategory($slug)

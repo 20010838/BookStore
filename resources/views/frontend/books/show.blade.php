@@ -3,6 +3,8 @@
 @section('title', $book->title)
 
 @section('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
 <style>
     .book-cover {
         max-height: 400px;
@@ -21,6 +23,33 @@
     
     .quantity-input {
         width: 70px;
+    }
+    
+    /* Style cho phần điều chỉnh số lượng */
+    .input-group {
+        max-width: 120px;
+        flex-wrap: nowrap;
+    }
+    
+    .input-group .btn-sm {
+        width: 30px;
+        height: 30px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        z-index: 0;
+    }
+    
+    #quantity {
+        height: 30px;
+        font-size: 14px;
+        padding: 0 5px;
+        width: 40px;
+        min-width: 40px;
+        border-left: 1px solid #dee2e6;
+        border-right: 1px solid #dee2e6;
     }
     
     .review-avatar {
@@ -63,6 +92,139 @@
         height: 200px;
         object-fit: cover;
     }
+    
+    /* Image Gallery Styles */
+    .main-image-container {
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+        height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f9f9f9;
+    }
+    
+    .main-image {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+    }
+    
+    .zoom-overlay {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: rgba(255, 255, 255, 0.7);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .main-image-container:hover .zoom-overlay {
+        opacity: 1;
+    }
+    
+    .thumbnails-container {
+        margin-top: 15px;
+    }
+    
+    /* New gallery thumbnails style */
+    .product-gallery-thumbs {
+        margin-top: 15px;
+    }
+    
+    .thumb-item {
+        cursor: pointer;
+        position: relative;
+        height: 80px;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 2px solid #eee;
+        transition: all 0.3s ease;
+    }
+    
+    .thumb-item.active {
+        border-color: #0d6efd;
+    }
+    
+    .thumb-item:hover {
+        border-color: #0d6efd;
+    }
+    
+    .thumb-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .thumb-more {
+        cursor: pointer;
+        position: relative;
+        height: 80px;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 2px solid #eee;
+        background-color: rgba(0,0,0,0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+    
+    .thumb-more:hover {
+        background-color: rgba(0,0,0,0.8);
+    }
+    
+    .thumb-more span {
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+    }
+    
+    /* Modal gallery styles */
+    #allImagesModal .thumb-item {
+        height: 120px;
+    }
+    
+    .thumbnail-swiper {
+        position: relative;
+        height: 80px;
+    }
+    
+    .thumbnail-item {
+        height: 80px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    
+    .thumbnail-item.active {
+        border-color: #0d6efd;
+    }
+    
+    .thumbnail-item img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+    }
+    
+    .swiper-button-next, .swiper-button-prev {
+        color: #0d6efd;
+        font-weight: bold;
+    }
+    
+    .swiper-button-next:after, .swiper-button-prev:after {
+        font-size: 20px;
+    }
 </style>
 @endsection
 
@@ -84,38 +246,119 @@
     <div class="row">
         <!-- Chi tiết sách -->
         <div class="col-lg-4 col-md-5">
-            <div class="card border-0 shadow-sm">
-                <div class="card-img-container p-4 bg-white d-flex align-items-center justify-content-center">
-                    <img src="{{ $book->cover_image ? asset('storage/' . $book->cover_image) : asset('images/book-placeholder.jpg') }}" 
-                         class="img-fluid book-detail-img" alt="{{ $book->title }}">
-                </div>
-                @if($book->stock > 0)
-                <div class="card-footer bg-white border-0 pb-3 d-flex justify-content-between">
-                    <form action="{{ route('cart.add') }}" method="POST" class="d-flex w-100 gap-2">
-                        @csrf
-                        <input type="hidden" name="book_id" value="{{ $book->id }}">
-                        <div class="input-group">
-                            <button type="button" class="btn btn-outline-primary btn-sm" id="decreaseQuantity">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                            <input type="number" name="quantity" id="quantity" value="1" min="1" max="{{ $book->stock }}" class="form-control text-center">
-                            <button type="button" class="btn btn-outline-primary btn-sm" id="increaseQuantity">
-                                <i class="fas fa-plus"></i>
-                            </button>
+            <div class="book-gallery mb-4">
+                <!-- Main Image with Lightbox -->
+                <div class="main-image-container mb-3">
+                    <a href="{{ Storage::url($book->primary_image_path ?? 'images/book-placeholder.jpg') }}" data-lightbox="book-gallery" data-title="{{ $book->title }}">
+                        <img src="{{ Storage::url($book->primary_image_path ?? 'images/book-placeholder.jpg') }}" class="main-image" alt="{{ $book->title }}">
+                        <div class="zoom-overlay">
+                            <i class="fas fa-search-plus"></i>
                         </div>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-cart-plus me-1"></i> Thêm vào giỏ
-                        </button>
-                    </form>
+                    </a>
                 </div>
-                @else
-                <div class="card-footer bg-white border-0 pb-3">
-                    <div class="alert alert-danger mb-0">
-                        <i class="fas fa-exclamation-circle me-1"></i> Sách tạm hết hàng
+
+                <!-- Thumbnails Gallery -->
+                @if($book->images->count() > 0 || $book->cover_image)
+                <div class="product-gallery-thumbs">
+                    <div class="row g-2">
+                        <!-- Ảnh chính -->
+                        @if($book->cover_image)
+                        <div class="col-3">
+                            <div class="thumb-item active" onclick="document.querySelector('.main-image').src='{{ Storage::url($book->cover_image) }}'; document.querySelector('.main-image-container > a').href='{{ Storage::url($book->cover_image) }}'; document.querySelectorAll('.thumb-item').forEach(e => e.classList.remove('active')); this.classList.add('active');">
+                                <img src="{{ Storage::url($book->cover_image) }}" alt="{{ $book->title }}">
+                            </div>
+                        </div>
+                        @endif
+                        
+                        <!-- Các ảnh phụ - hiển thị tối đa 3 ảnh -->
+                        @php $remainingImagesCount = 0; @endphp
+                        @foreach($book->images as $key => $image)
+                            @if($key < 3)
+                            <div class="col-3">
+                                <div class="thumb-item" onclick="document.querySelector('.main-image').src='{{ Storage::url($image->image_path) }}'; document.querySelector('.main-image-container > a').href='{{ Storage::url($image->image_path) }}'; document.querySelectorAll('.thumb-item').forEach(e => e.classList.remove('active')); this.classList.add('active');">
+                                    <img src="{{ Storage::url($image->image_path) }}" alt="{{ $image->caption ?? $book->title }}">
+                                </div>
+                            </div>
+                            @else
+                                @php $remainingImagesCount++; @endphp
+                            @endif
+                        @endforeach
+                        
+                        <!-- Nếu có nhiều hơn 3 ảnh thì hiển thị nút +n -->
+                        @if($remainingImagesCount > 0)
+                        <div class="col-3">
+                            <div class="thumb-more" onclick="document.getElementById('allImagesModal').classList.add('show'); document.getElementById('allImagesModal').style.display = 'block'; document.querySelector('body').classList.add('modal-open');">
+                                <span>+{{ $remainingImagesCount }}</span>
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 </div>
                 @endif
             </div>
+            
+            <!-- Modal hiển thị tất cả ảnh -->
+            <div class="modal fade" id="allImagesModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Tất cả hình ảnh</h5>
+                            <button type="button" class="btn-close" onclick="document.getElementById('allImagesModal').classList.remove('show'); document.getElementById('allImagesModal').style.display = 'none'; document.querySelector('body').classList.remove('modal-open');" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row g-2">
+                                @if($book->cover_image)
+                                <div class="col-4 mb-3">
+                                    <div class="thumb-item" onclick="document.querySelector('.main-image').src='{{ Storage::url($book->cover_image) }}'; document.querySelector('.main-image-container > a').href='{{ Storage::url($book->cover_image) }}'; document.querySelectorAll('.thumb-item').forEach(e => e.classList.remove('active')); this.classList.add('active'); document.getElementById('allImagesModal').classList.remove('show'); document.getElementById('allImagesModal').style.display = 'none'; document.querySelector('body').classList.remove('modal-open');">
+                                        <img src="{{ Storage::url($book->cover_image) }}" alt="{{ $book->title }}" class="img-fluid">
+                                    </div>
+                                </div>
+                                @endif
+                                @foreach($book->images as $image)
+                                <div class="col-4 mb-3">
+                                    <div class="thumb-item" onclick="document.querySelector('.main-image').src='{{ Storage::url($image->image_path) }}'; document.querySelector('.main-image-container > a').href='{{ Storage::url($image->image_path) }}'; document.querySelectorAll('.thumb-item').forEach(e => e.classList.remove('active')); this.classList.add('active'); document.getElementById('allImagesModal').classList.remove('show'); document.getElementById('allImagesModal').style.display = 'none'; document.querySelector('body').classList.remove('modal-open');">
+                                        <img src="{{ Storage::url($image->image_path) }}" alt="{{ $image->caption ?? $book->title }}" class="img-fluid">
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            @if($book->stock > 0)
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <form action="{{ route('cart.add') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="book_id" value="{{ $book->id }}">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="input-group flex-nowrap">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="decreaseQuantity">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" name="quantity" id="quantity" value="1" min="1" max="{{ $book->stock }}" class="form-control text-center">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="increaseQuantity">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            <button type="submit" class="btn btn-primary flex-grow-1">
+                                <i class="fas fa-cart-plus me-1"></i> Thêm vào giỏ
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            @else
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="alert alert-danger mb-0">
+                        <i class="fas fa-exclamation-circle me-1"></i> Sách tạm hết hàng
+                    </div>
+                </div>
+            </div>
+            @endif
             
             <div class="card mt-4 border-0 shadow-sm">
                 <div class="card-header bg-primary text-white">
@@ -173,7 +416,7 @@
                     @endif
                     
                     <div class="book-description mb-4">
-                        <h5 class="mb-3">Giới thiệu sách</h5>
+                        <h5 class="mb-3">Giới thiệu sách1</h5>
                         <p>{{ $book->description }}</p>
                     </div>
                     
@@ -332,50 +575,39 @@
         </div>
     </div>
 </div>
+@endsection
 
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Xử lý nút tăng/giảm số lượng
-        const quantityInput = document.getElementById('quantity');
-        const decreaseBtn = document.getElementById('decreaseQuantity');
-        const increaseBtn = document.getElementById('increaseQuantity');
-        const max = parseInt(quantityInput.getAttribute('max'));
-        
-        decreaseBtn.addEventListener('click', function() {
-            const currentValue = parseInt(quantityInput.value);
-            if (currentValue > 1) {
-                quantityInput.value = currentValue - 1;
-            }
-        });
-        
-        increaseBtn.addEventListener('click', function() {
-            const currentValue = parseInt(quantityInput.value);
-            if (currentValue < max) {
-                quantityInput.value = currentValue + 1;
-            }
-        });
-        
-        // Xử lý đánh giá sao
-        const ratingInputs = document.querySelectorAll('.rating-input input');
-        const ratingLabels = document.querySelectorAll('.rating-input label');
-        
-        ratingInputs.forEach((input, index) => {
-            input.addEventListener('change', function() {
-                for (let i = 0; i < ratingLabels.length; i++) {
-                    if (i >= ratingLabels.length - index - 1) {
-                        ratingLabels[i].innerHTML = '<i class="fas fa-star"></i>';
-                    } else {
-                        ratingLabels[i].innerHTML = '<i class="far fa-star"></i>';
-                    }
-                }
-            });
-        });
-        
-        // Khởi tạo tooltips
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
+$(document).ready(function() {
+    // Initialize Lightbox
+    lightbox.option({
+        'resizeDuration': 200,
+        'wrapAround': true,
+        'albumLabel': "Hình ảnh %1 / %2"
     });
+    
+    // Handle quantity buttons
+    $('#increaseQuantity').click(function() {
+        const quantityInput = $('#quantity');
+        const currentVal = parseInt(quantityInput.val());
+        const maxVal = parseInt(quantityInput.attr('max'));
+        
+        if(currentVal < maxVal) {
+            quantityInput.val(currentVal + 1);
+        }
+    });
+    
+    $('#decreaseQuantity').click(function() {
+        const quantityInput = $('#quantity');
+        const currentVal = parseInt(quantityInput.val());
+        
+        if(currentVal > 1) {
+            quantityInput.val(currentVal - 1);
+        }
+    });
+});
 </script>
-@endsection 
+@endpush 

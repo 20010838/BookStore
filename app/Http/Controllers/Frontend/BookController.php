@@ -122,9 +122,10 @@ class BookController extends Controller
         
         // Tải thêm images và gán cho gallery
         $book->load('images');
-        $book->gallery = $book->images;
         
-        return view('frontend.books.show', compact('book', 'relatedBooks', 'reviews'));
+        return view('frontend.details', compact('book', 'relatedBooks', 'reviews'))
+                ->with('item', $book)
+                ->with('type', 'book');
     }
     
     /**

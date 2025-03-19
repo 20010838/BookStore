@@ -1,5 +1,11 @@
 @extends('layouts.frontend')
 
+@section('title', $product->name)
+
+@push('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
+@endpush
+
 @section('content')
 <div class="container py-4">
     <div class="row">
@@ -17,23 +23,65 @@
                 </div>
 
                 <!-- Thumbnails Gallery -->
-                <div class="thumbnails-container">
-                    <div class="swiper-container thumbnail-swiper">
-                        <div class="swiper-wrapper">
-                            <div class="swiper-slide thumbnail-item active" data-index="0">
-                                <img src="{{ Storage::url($product->image) }}" class="img-thumbnail" 
-                                     alt="{{ $product->name }}" data-src="{{ Storage::url($product->image) }}">
+                <div class="product-gallery-thumbs">
+                    <div class="row g-2">
+                        <!-- Ảnh chính -->
+                        <div class="col-3">
+                            <div class="thumb-item active" onclick="changeMainImage('{{ Storage::url($product->image) }}')">
+                                <img src="{{ Storage::url($product->image) }}" alt="{{ $product->name }}">
                             </div>
-                            @foreach($product->images as $key => $image)
-                            <div class="swiper-slide thumbnail-item" data-index="{{ $key + 1 }}">
-                                <img src="{{ Storage::url($image->image_path) }}" class="img-thumbnail" 
-                                     alt="{{ $image->caption ?? $product->name }}" data-src="{{ Storage::url($image->image_path) }}">
-                            </div>
-                            @endforeach
                         </div>
-                        <!-- Navigation buttons -->
-                        <div class="swiper-button-next"></div>
-                        <div class="swiper-button-prev"></div>
+                        
+                        <!-- Các ảnh phụ - hiển thị tối đa 3 ảnh -->
+                        @php $remainingImagesCount = 0; @endphp
+                        @foreach($product->images as $key => $image)
+                            @if($key < 3)
+                            <div class="col-3">
+                                <div class="thumb-item" onclick="changeMainImage('{{ Storage::url($image->image_path) }}')">
+                                    <img src="{{ Storage::url($image->image_path) }}" alt="{{ $image->caption ?? $product->name }}">
+                                </div>
+                            </div>
+                            @else
+                                @php $remainingImagesCount++; @endphp
+                            @endif
+                        @endforeach
+                        
+                        <!-- Nếu có nhiều hơn 3 ảnh thì hiển thị nút +n -->
+                        @if($remainingImagesCount > 0)
+                        <div class="col-3">
+                            <div class="thumb-more" onclick="showAllImages()">
+                                <span>+{{ $remainingImagesCount }}</span>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal hiển thị tất cả ảnh -->
+            <div class="modal fade" id="allImagesModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Tất cả hình ảnh</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row g-2">
+                                <div class="col-4 mb-3">
+                                    <div class="thumb-item" onclick="changeMainImageAndClose('{{ Storage::url($product->image) }}')">
+                                        <img src="{{ Storage::url($product->image) }}" alt="{{ $product->name }}" class="img-fluid">
+                                    </div>
+                                </div>
+                                @foreach($product->images as $image)
+                                <div class="col-4 mb-3">
+                                    <div class="thumb-item" onclick="changeMainImageAndClose('{{ Storage::url($image->image_path) }}')">
+                                        <img src="{{ Storage::url($image->image_path) }}" alt="{{ $image->caption ?? $product->name }}" class="img-fluid">
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -255,43 +303,125 @@
 </div>
 
 @push('styles')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightbox2@2.11.3/dist/css/lightbox.min.css">
 <style>
-    .product-gallery {
-        position: relative;
+    .book-cover {
+        max-height: 400px;
+        object-fit: contain;
     }
     
+    .book-details {
+        position: sticky;
+        top: 100px;
+    }
+    
+    .book-info-table tr td:first-child {
+        width: 150px;
+        font-weight: 600;
+    }
+    
+    .quantity-input {
+        width: 70px;
+    }
+    
+    /* Style cho phần điều chỉnh số lượng */
+    .input-group {
+        max-width: 120px;
+        flex-wrap: nowrap;
+    }
+    
+    .input-group .btn-sm {
+        width: 30px;
+        height: 30px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        z-index: 0;
+    }
+    
+    #quantity {
+        height: 30px;
+        font-size: 14px;
+        padding: 0 5px;
+        width: 40px;
+        min-width: 40px;
+        border-left: 1px solid #dee2e6;
+        border-right: 1px solid #dee2e6;
+    }
+    
+    .review-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    
+    .star-rating .fas {
+        color: #ffc107;
+    }
+    
+    .star-rating .far {
+        color: #e4e5e9;
+    }
+    
+    .rating-input:not(:checked) ~ label {
+        color: #ddd;
+    }
+    
+    .rating-input:checked ~ label {
+        color: #ffc107;
+    }
+    
+    .rating-input:hover ~ label {
+        color: #ffc107;
+    }
+    
+    .related-book-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .related-book-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .related-book-card .card-img-top {
+        height: 200px;
+        object-fit: cover;
+    }
+    
+    /* Image Gallery Styles */
     .main-image-container {
         position: relative;
         overflow: hidden;
         border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f9f9f9;
     }
     
     .main-image {
-        width: 100%;
-        height: 400px;
+        max-height: 100%;
+        max-width: 100%;
         object-fit: contain;
-        background-color: #f8f9fa;
-        transition: transform 0.3s ease;
-    }
-    
-    .main-image-container:hover .main-image {
-        transform: scale(1.03);
     }
     
     .zoom-overlay {
         position: absolute;
         top: 10px;
         right: 10px;
-        background-color: rgba(255,255,255,0.8);
+        background-color: rgba(255, 255, 255, 0.7);
+        border-radius: 50%;
         width: 40px;
         height: 40px;
-        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
+        cursor: pointer;
         opacity: 0;
         transition: opacity 0.3s ease;
     }
@@ -300,36 +430,95 @@
         opacity: 1;
     }
     
+    .thumbnails-container {
+        margin-top: 15px;
+    }
+    
+    /* New gallery thumbnails style */
+    .product-gallery-thumbs {
+        margin-top: 15px;
+    }
+    
+    .thumb-item {
+        cursor: pointer;
+        position: relative;
+        height: 80px;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 2px solid #eee;
+        transition: all 0.3s ease;
+    }
+    
+    .thumb-item.active {
+        border-color: #0d6efd;
+    }
+    
+    .thumb-item:hover {
+        border-color: #0d6efd;
+    }
+    
+    .thumb-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .thumb-more {
+        cursor: pointer;
+        position: relative;
+        height: 80px;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 2px solid #eee;
+        background-color: rgba(0,0,0,0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+    
+    .thumb-more:hover {
+        background-color: rgba(0,0,0,0.8);
+    }
+    
+    .thumb-more span {
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+    }
+    
+    /* Modal gallery styles */
+    #allImagesModal .thumb-item {
+        height: 120px;
+    }
+    
     .thumbnail-swiper {
-        height: 100px;
-        padding: 0 30px;
+        position: relative;
+        height: 80px;
     }
     
     .thumbnail-item {
+        height: 80px;
         cursor: pointer;
-        opacity: 0.6;
-        transition: opacity 0.3s ease;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        border-radius: 5px;
+        overflow: hidden;
     }
     
     .thumbnail-item.active {
-        opacity: 1;
-        border: 2px solid #007bff;
-    }
-    
-    .thumbnail-item:hover {
-        opacity: 1;
+        border-color: #0d6efd;
     }
     
     .thumbnail-item img {
-        height: 80px;
+        height: 100%;
         width: 100%;
         object-fit: cover;
     }
     
     .swiper-button-next, .swiper-button-prev {
-        color: #007bff;
-        width: 30px;
-        height: 30px;
+        color: #0d6efd;
+        font-weight: bold;
     }
     
     .swiper-button-next:after, .swiper-button-prev:after {
@@ -339,7 +528,6 @@
 @endpush
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lightbox2@2.11.3/dist/js/lightbox.min.js"></script>
 <script>
 function updateQuantity(change) {
@@ -353,52 +541,41 @@ function updateQuantity(change) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Swiper
-    const swiper = new Swiper('.thumbnail-swiper', {
-        slidesPerView: 4,
-        spaceBetween: 10,
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-        breakpoints: {
-            // when window width is >= 320px
-            320: {
-                slidesPerView: 3,
-                spaceBetween: 5
-            },
-            // when window width is >= 480px
-            480: {
-                slidesPerView: 3,
-                spaceBetween: 10
-            },
-            // when window width is >= 640px
-            640: {
-                slidesPerView: 4,
-                spaceBetween: 10
-            }
-        }
-    });
-
-    // Thumbnail click handler
-    const thumbnails = document.querySelectorAll('.thumbnail-item');
+function changeMainImage(imageSrc) {
     const mainImage = document.querySelector('.main-image');
     const mainImageLink = document.querySelector('.main-image-container a');
-
-    thumbnails.forEach(thumbnail => {
-        thumbnail.addEventListener('click', function() {
-            // Update active state
-            thumbnails.forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Update main image
-            const imgSrc = this.querySelector('img').getAttribute('data-src');
-            mainImage.src = imgSrc;
-            mainImageLink.href = imgSrc;
-        });
+    
+    // Cập nhật đường dẫn ảnh
+    mainImage.src = imageSrc;
+    mainImageLink.href = imageSrc;
+    
+    // Cập nhật trạng thái active
+    const thumbItems = document.querySelectorAll('.thumb-item');
+    thumbItems.forEach(item => {
+        if (item.querySelector('img').src === imageSrc) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
     });
+}
 
+function changeMainImageAndClose(imageSrc) {
+    changeMainImage(imageSrc);
+    
+    // Đóng modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('allImagesModal'));
+    if (modal) {
+        modal.hide();
+    }
+}
+
+function showAllImages() {
+    const modal = new bootstrap.Modal(document.getElementById('allImagesModal'));
+    modal.show();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
     // Initialize Lightbox
     lightbox.option({
         'resizeDuration': 200,
@@ -409,4 +586,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush
+
 @endsection 

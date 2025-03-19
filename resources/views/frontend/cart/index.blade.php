@@ -64,11 +64,11 @@
                                                     </a>
                                                 </h5>
                                                 <p class="text-muted mb-0">
-                                                    @if($item->product->category == 'toys')
+                                                    <!-- @if($item->product->category == 'toys')
                                                         Đồ chơi
                                                     @else
                                                         Dụng cụ học tập
-                                                    @endif
+                                                    @endif -->
                                                 </p>
                                         @endif
                                                 <form action="{{ route('cart.remove', $item->id) }}" method="POST" class="mt-2">

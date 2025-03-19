@@ -89,6 +89,20 @@ class Book extends Model
         return $this->images()->where('is_primary', true)->first() 
             ?? $this->images()->first();
     }
+    
+    /**
+     * Get the primary image path for the book
+     * Returns cover_image if exists, otherwise gets from book_images if exists
+     */
+    public function getPrimaryImagePathAttribute()
+    {
+        if ($this->cover_image) {
+            return $this->cover_image;
+        }
+        
+        $primaryImage = $this->getPrimaryImageAttribute();
+        return $primaryImage ? $primaryImage->image_path : null;
+    }
 
     /**
      * Get the average rating of the book.

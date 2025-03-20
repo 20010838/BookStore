@@ -27,7 +27,7 @@
         position: absolute;
         top: 10px;
         right: 10px;
-        background-color: rgba(255, 255, 255, 0.7);
+        background-color: rgba(255, 255, 255, 0.8);
         border-radius: 50%;
         width: 40px;
         height: 40px;
@@ -35,8 +35,9 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        opacity: 0;
+        opacity: 0.8;
         transition: opacity 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     
     .main-image-container:hover .zoom-overlay {
@@ -97,6 +98,23 @@
         border-left: 1px solid #dee2e6;
         border-right: 1px solid #dee2e6;
     }
+    
+    .image-help-text {
+        position: absolute;
+        bottom: 10px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        background-color: rgba(255,255,255,0.7);
+        padding: 5px;
+        font-size: 0.8rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .main-image-container:hover .image-help-text {
+        opacity: 1;
+    }
 </style>
 @endpush
 
@@ -154,12 +172,15 @@
                 
                 <!-- Main Image bên phải -->
                 <div class="main-image-container">
-                    <a href="{{ Storage::url($mainImage) }}" data-lightbox="item-gallery" data-title="{{ $item->name ?? $item->title }}">
-                        <img src="{{ Storage::url($mainImage) }}" class="img-fluid main-image" alt="{{ $item->name ?? $item->title }}">
+                    <a href="javascript:void(0);" data-lightbox-src="{{ Storage::url($mainImage) }}" data-lightbox="item-gallery" data-title="{{ $item->name ?? $item->title }}" class="main-image-link">
+                        <img src="{{ Storage::url($mainImage) }}" class="img-fluid main-image" alt="{{ $item->name ?? $item->title }}" id="currentMainImage">
                         <div class="zoom-overlay">
                             <i class="fas fa-search-plus"></i>
                         </div>
                     </a>
+                    <div class="image-help-text">
+                        <small class="text-muted">Nhấp vào ảnh để phóng to. Giữ Ctrl+Click vào ảnh nhỏ để mở lightbox trực tiếp.</small>
+                    </div>
                 </div>
                 
                 <style>
@@ -210,12 +231,14 @@
                                     <div class="col-4 mb-3">
                                         <div class="thumb-item modal-thumb" data-image="{{ Storage::url($mainImage) }}">
                                             <img src="{{ Storage::url($mainImage) }}" alt="{{ $item->name ?? $item->title }}" class="img-fluid">
+                                            <a href="{{ Storage::url($mainImage) }}" data-lightbox="item-gallery" data-title="{{ $item->name ?? $item->title }}" class="d-none"></a>
                                         </div>
                                     </div>
                                     @foreach($item->images as $image)
                                     <div class="col-4 mb-3">
                                         <div class="thumb-item modal-thumb" data-image="{{ Storage::url($image->image_path) }}">
                                             <img src="{{ Storage::url($image->image_path) }}" alt="{{ $image->caption ?? ($item->name ?? $item->title) }}" class="img-fluid">
+                                            <a href="{{ Storage::url($image->image_path) }}" data-lightbox="item-gallery" data-title="{{ $image->caption ?? ($item->name ?? $item->title) }}" class="d-none"></a>
                                         </div>
                                     </div>
                                     @endforeach
@@ -617,24 +640,9 @@
 <script src="https://cdn.jsdelivr.net/npm/lightbox2@2.11.3/dist/js/lightbox.min.js"></script>
 <script>
 $(document).ready(function() {
-    // Xử lý đổi ảnh khi click vào thumbnail
-    $('.thumb-item').click(function() {
-        if (!$(this).hasClass('thumb-more') && !$(this).hasClass('modal-thumb')) {
-            var imageSrc = $(this).data('image');
-            changeMainImage(imageSrc);
-        }
-    });
-    
-    // Xử lý thumbnail trong modal
-    $('.modal-thumb').click(function() {
-        var imageSrc = $(this).data('image');
-        changeMainImage(imageSrc);
-        $('#allImagesModal').modal('hide');
-    });
-    
-    // Mở modal khi click vào nút xem thêm
-    $('#showMoreImages').click(function() {
-        $('#allImagesModal').modal('show');
+    // Đảm bảo Lightbox được khởi tạo sau khi tất cả ảnh được tải
+    $('img').on('load', function() {
+        // console.log('Ảnh đã được tải: ', this.src);
     });
     
     // Khởi tạo Lightbox
@@ -642,7 +650,59 @@ $(document).ready(function() {
         'resizeDuration': 200,
         'wrapAround': true,
         'disableScrolling': true,
-        'fitImagesInViewport': true
+        'fitImagesInViewport': true,
+        'alwaysShowNavOnTouchDevices': true,
+        'showImageNumberLabel': false
+    });
+    
+    // Ngăn chặn hành vi mặc định khi click vào ảnh chính
+    $('.main-image-container > a').on('click', function(e) {
+        e.preventDefault();
+        var imgSrc = $(this).attr('data-lightbox-src');
+        var imgTitle = $(this).attr('data-title');
+        
+        showCustomLightbox(imgSrc, imgTitle);
+        return false;
+    });
+    
+    // Xử lý đổi ảnh khi click vào thumbnail và mở lightbox khi ctrl+click
+    $('.product-thumbnail img').click(function(e) {
+        var imageSrc = $(this).attr('src');
+        if (e.ctrlKey) {
+            // Mở lightbox khi giữ Ctrl và click
+            e.preventDefault();
+            
+            // Tìm title cho ảnh
+            var imgTitle = $(this).attr('alt');
+            showCustomLightbox(imageSrc, imgTitle);
+        } else {
+            // Thay đổi ảnh chính
+            changeMainImage(imageSrc);
+        }
+    });
+    
+    // Xử lý thumbnail trong modal
+    $('.modal-thumb').click(function(e) {
+        var imageSrc = $(this).data('image');
+        if (e.ctrlKey) {
+            // Mở lightbox khi giữ Ctrl và click
+            e.preventDefault();
+            
+            // Tìm title cho ảnh
+            var imgTitle = $(this).find('img').attr('alt');
+            showCustomLightbox(imageSrc, imgTitle);
+            
+            $('#allImagesModal').modal('hide');
+        } else {
+            // Thay đổi ảnh chính
+            changeMainImage(imageSrc);
+            $('#allImagesModal').modal('hide');
+        }
+    });
+    
+    // Mở modal khi click vào nút xem thêm
+    $('#showMoreImages').click(function() {
+        $('#allImagesModal').modal('show');
     });
     
     // Xử lý nút tăng/giảm số lượng
@@ -655,10 +715,80 @@ $(document).ready(function() {
     });
 });
 
+// Hàm hiển thị lightbox tùy chỉnh
+function showCustomLightbox(imgSrc, imgTitle) {
+    // Tạo overlay lightbox thủ công
+    var lightboxInstance = new Image();
+    lightboxInstance.src = imgSrc;
+    lightboxInstance.onload = function() {
+        var $lightbox = $('<div id="lightbox-temp" class="lightbox"></div>');
+        var $img = $('<img src="' + imgSrc + '" alt="' + imgTitle + '">');
+        var $close = $('<div class="lb-close">&times;</div>');
+        
+        $lightbox.css({
+            'position': 'fixed',
+            'top': 0,
+            'left': 0,
+            'width': '100%',
+            'height': '100%',
+            'background': 'rgba(0, 0, 0, 0.8)',
+            'z-index': 9999,
+            'display': 'flex',
+            'align-items': 'center',
+            'justify-content': 'center'
+        });
+        
+        $img.css({
+            'max-width': '90%',
+            'max-height': '90%',
+            'object-fit': 'contain'
+        });
+        
+        $close.css({
+            'position': 'absolute',
+            'top': '20px',
+            'right': '20px',
+            'color': 'white',
+            'font-size': '30px',
+            'cursor': 'pointer'
+        });
+        
+        $lightbox.append($img).append($close);
+        $('body').append($lightbox);
+        
+        // Đóng lightbox khi nhấp vào nền hoặc nút đóng
+        $lightbox.on('click', function(e) {
+            if (e.target === this || $(e.target).hasClass('lb-close')) {
+                $(this).remove();
+            }
+        });
+        
+        // Đóng lightbox khi nhấn Esc
+        $(document).on('keydown.lightbox', function(e) {
+            if (e.keyCode === 27) { // Esc key
+                $('#lightbox-temp').remove();
+                $(document).off('keydown.lightbox');
+            }
+        });
+    };
+}
+
 function changeMainImage(imageSrc) {
     // Cập nhật ảnh chính
     $('.main-image').attr('src', imageSrc);
-    $('.main-image-container > a').attr('href', imageSrc);
+    
+    // Tìm title từ thumbnail tương ứng
+    var imgTitle = '';
+    $('.product-thumbnail img').each(function() {
+        if ($(this).attr('src') === imageSrc) {
+            imgTitle = $(this).attr('alt');
+        }
+    });
+    
+    // Cập nhật lightbox link
+    $('.main-image-container > a').attr('data-lightbox-src', imageSrc);
+    $('.main-image-container > a').data('lightbox', 'item-gallery');
+    $('.main-image-container > a').attr('data-title', imgTitle);
     
     // Highlight thumbnail đang chọn
     $('.product-thumbnail img').removeClass('border-primary').addClass('border');

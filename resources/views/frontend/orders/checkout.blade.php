@@ -51,18 +51,42 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="city" class="form-label">Thành phố <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('city') is-invalid @enderror" id="city" name="city" value="{{ old('city', Auth::user()->city ?? '') }}" required>
-                                @error('city')
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="province" class="form-label">Tỉnh/Thành phố <span class="text-danger">*</span></label>
+                                <select class="form-select @error('province') is-invalid @enderror" id="province" name="province" required>
+                                    <option value="">Chọn Tỉnh/Thành phố</option>
+                                </select>
+                                @error('province')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="district" class="form-label">Quận/Huyện <span class="text-danger">*</span></label>
+                                <select class="form-select @error('district') is-invalid @enderror" id="district" name="district" required disabled>
+                                    <option value="">Chọn Quận/Huyện</option>
+                                </select>
+                                @error('district')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="ward" class="form-label">Phường/Xã <span class="text-danger">*</span></label>
+                                <select class="form-select @error('ward') is-invalid @enderror" id="ward" name="ward" required disabled>
+                                    <option value="">Chọn Phường/Xã</option>
+                                </select>
+                                @error('ward')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <input type="hidden" name="city" id="city_input" value="{{ old('city', Auth::user()->city ?? '') }}">
                         </div>
 
                         <div class="mb-3">
-                            <label for="address" class="form-label">Địa chỉ <span class="text-danger">*</span></label>
-                            <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address" rows="3" required>{{ old('address', Auth::user()->address ?? '') }}</textarea>
+                            <label for="address" class="form-label">Số nhà, tên đường <span class="text-danger">*</span></label>
+                            <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address" rows="2" required>{{ old('address', Auth::user()->address ?? '') }}</textarea>
                             @error('address')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -144,4 +168,112 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+$(document).ready(function() {
+    // Load provinces
+    $.ajax({
+        url: 'https://provinces.open-api.vn/api/p/',
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            let options = '<option value="">Chọn Tỉnh/Thành phố</option>';
+            data.forEach(function(province) {
+                options += `<option value="${province.code}">${province.name}</option>`;
+            });
+            $('#province').html(options);
+        },
+        error: function(error) {
+            console.log('Lỗi khi lấy dữ liệu tỉnh/thành phố:', error);
+        }
+    });
+
+    // Event handler for province select
+    $('#province').on('change', function() {
+        const provinceCode = $(this).val();
+        const provinceName = $(this).find('option:selected').text();
+        
+        $('#city_input').val(provinceName);
+        
+        if (provinceCode) {
+            $('#district').prop('disabled', false);
+            
+            // Load districts
+            $.ajax({
+                url: `https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`,
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    let options = '<option value="">Chọn Quận/Huyện</option>';
+                    data.districts.forEach(function(district) {
+                        options += `<option value="${district.code}">${district.name}</option>`;
+                    });
+                    $('#district').html(options);
+                },
+                error: function(error) {
+                    console.log('Lỗi khi lấy dữ liệu quận/huyện:', error);
+                }
+            });
+        } else {
+            $('#district').prop('disabled', true).html('<option value="">Chọn Quận/Huyện</option>');
+            $('#ward').prop('disabled', true).html('<option value="">Chọn Phường/Xã</option>');
+        }
+    });
+
+    // Event handler for district select
+    $('#district').on('change', function() {
+        const districtCode = $(this).val();
+        
+        if (districtCode) {
+            $('#ward').prop('disabled', false);
+            
+            // Load wards
+            $.ajax({
+                url: `https://provinces.open-api.vn/api/d/${districtCode}?depth=2`,
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    let options = '<option value="">Chọn Phường/Xã</option>';
+                    data.wards.forEach(function(ward) {
+                        options += `<option value="${ward.code}">${ward.name}</option>`;
+                    });
+                    $('#ward').html(options);
+                },
+                error: function(error) {
+                    console.log('Lỗi khi lấy dữ liệu phường/xã:', error);
+                }
+            });
+        } else {
+            $('#ward').prop('disabled', true).html('<option value="">Chọn Phường/Xã</option>');
+        }
+    });
+
+    // Form submission handler
+    $('form').on('submit', function(e) {
+        const fullAddress = [];
+        
+        // Add street address
+        if ($('#address').val().trim()) {
+            fullAddress.push($('#address').val().trim());
+        }
+        
+        // Add ward
+        if ($('#ward option:selected').text() !== 'Chọn Phường/Xã') {
+            fullAddress.push($('#ward option:selected').text());
+        }
+        
+        // Add district
+        if ($('#district option:selected').text() !== 'Chọn Quận/Huyện') {
+            fullAddress.push($('#district option:selected').text());
+        }
+        
+        // Update the address field
+        if (fullAddress.length > 0) {
+            $('#address').val(fullAddress.join(', '));
+        }
+    });
+});
+</script>
 @endsection 

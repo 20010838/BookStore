@@ -313,7 +313,13 @@
                             <i class="fas fa-shopping-cart"></i>
                             <span class="cart-badge">
                                 @php
-                                    $cartCount = session('cart') ? count(session('cart')) : 0;
+                                    $cartCount = 0;
+                                    if (Auth::check()) {
+                                        $cartItems = \App\Models\Cart::where('user_id', Auth::id())->get();
+                                        foreach ($cartItems as $item) {
+                                            $cartCount += $item->quantity;
+                                        }
+                                    }
                                 @endphp
                                 {{ $cartCount }}
                             </span>

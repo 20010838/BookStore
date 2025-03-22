@@ -39,22 +39,27 @@
 
         <div class="col-lg-9">
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Đơn hàng #{{ $order->order_number }}</h5>
-                    <span class="badge 
-                        @if($order->status == 'pending') bg-warning
-                        @elseif($order->status == 'processing') bg-info
-                        @elseif($order->status == 'shipped') bg-primary
-                        @elseif($order->status == 'delivered') bg-success
-                        @elseif($order->status == 'cancelled') bg-danger
-                        @endif">
-                        @if($order->status == 'pending') Đang xử lý
-                        @elseif($order->status == 'processing') Đang chuẩn bị
-                        @elseif($order->status == 'shipped') Đang giao hàng
-                        @elseif($order->status == 'delivered') Đã giao hàng
-                        @elseif($order->status == 'cancelled') Đã hủy
-                        @endif
-                    </span>
+                <div class="card-header bg-white p-4">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                        <div>
+                            <h4 class="mb-1">Đơn hàng #{{ $order->order_number }}</h4>
+                            <p class="text-muted mb-0">Đặt ngày: {{ $order->created_at->format('H:i - d/m/Y') }}</p>
+                        </div>
+                        <span class="badge 
+                            @if($order->status == 'pending') bg-warning
+                            @elseif($order->status == 'processing') bg-info
+                            @elseif($order->status == 'shipped') bg-primary
+                            @elseif($order->status == 'delivered') bg-success
+                            @elseif($order->status == 'cancelled') bg-danger
+                            @endif">
+                            @if($order->status == 'pending') Đang xử lý
+                            @elseif($order->status == 'processing') Đang chuẩn bị
+                            @elseif($order->status == 'shipped') Đang giao hàng
+                            @elseif($order->status == 'delivered') Đã giao hàng
+                            @elseif($order->status == 'cancelled') Đã hủy
+                            @endif
+                        </span>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row mb-4">

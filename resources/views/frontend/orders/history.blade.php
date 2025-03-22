@@ -67,7 +67,7 @@
                                     @foreach($orders as $order)
                                     <tr>
                                         <td>{{ $order->order_number }}</td>
-                                        <td>{{ $order->created_at->format('d/m/Y') }}</td>
+                                        <td>{{ $order->created_at->format('H:i - d/m/Y') }}</td>
                                         <td>{{ number_format($order->total_amount) }} VNĐ</td>
                                         <td>
                                             @if($order->status == 'pending')

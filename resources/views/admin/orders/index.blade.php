@@ -4,8 +4,14 @@
 
 @section('content')
 <div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Quản lý đơn hàng</h1>
+        <a href="{{ route('admin.orders.create') }}" class="d-none d-sm-inline-block btn btn-primary shadow-sm">
+            <i class="fas fa-plus fa-sm text-white-50"></i> Tạo đơn hàng mới
+        </a>
+    </div>
+
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3">Quản lý đơn hàng</h1>
         <a href="{{ route('admin.orders.export') }}" class="btn btn-success">
             <i class="fas fa-file-excel"></i> Xuất Excel
         </a>

@@ -70,13 +70,7 @@
         max-width: 60%;
     }
     
-    .banner-title {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: #fff;
-        margin-bottom: 5px;
-    }
-    
+  
     .banner-subtitle {
         font-size: 1rem;
         color: #f8f9fa;
@@ -87,9 +81,7 @@
             height: 350px;
         }
         
-        .banner-title {
-            font-size: 1.5rem;
-        }
+      
     }
     
     @media (max-width: 767px) {
@@ -114,9 +106,7 @@
             padding: 10px;
         }
         
-        .banner-title {
-            font-size: 1.2rem;
-        }
+      
     }
     
     /* Existing Styles */
@@ -150,13 +140,7 @@
         max-width: 50%;
     }
     
-    .banner-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #fff;
-        margin-bottom: 10px;
-    }
-    
+
     .banner-subtitle {
         font-size: 1.2rem;
         color: #f8f9fa;
@@ -196,9 +180,7 @@
             max-width: 70%;
         }
         
-        .banner-title {
-            font-size: 1.8rem;
-        }
+       
     }
     
     @media (max-width: 768px) {
@@ -210,10 +192,7 @@
             max-width: 80%;
         }
         
-        .banner-title {
-            font-size: 1.5rem;
-        }
-        
+    
         .banner-subtitle {
             font-size: 1rem;
         }
@@ -229,10 +208,7 @@
             padding: 15px;
         }
         
-        .banner-title {
-            font-size: 1.2rem;
-            margin-bottom: 5px;
-        }
+     
         
         .banner-subtitle {
             font-size: 0.9rem;
@@ -329,7 +305,7 @@
                             <a href="{{ $banner->link_url ?? '#' }}" class="d-flex align-items-center justify-content-center">
                                 <img src="{{ Storage::url($banner->image_path) }}" alt="{{ $banner->title ?? 'Banner slide ' . ($key+1) }}">
                                 @if($banner->title || $banner->subtitle)
-                                <div class="carousel-caption">
+                                <!-- <div class="carousel-caption">
                                     <div class="banner-caption d-none d-md-block">
                                         @if($banner->title)
                                         <h2 class="banner-title">{{ $banner->title }}</h2>
@@ -338,7 +314,7 @@
                                         <div class="banner-subtitle">{{ $banner->subtitle }}</div>
                                         @endif
                                     </div>
-                                </div>
+                                </div> -->
                                 @endif
                             </a>
                         </div>

@@ -55,7 +55,19 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $user = User::with(['orders', 'reviews'])->findOrFail($id);
+        $user = User::findOrFail($id);
+        
+        if (request()->ajax()) {
+            return response()->json([
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'address' => $user->address,
+                'city' => $user->city,
+            ]);
+        }
+        
         return view('admin.users.show', compact('user'));
     }
 

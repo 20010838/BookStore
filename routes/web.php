@@ -81,6 +81,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/order-success/{id}', [OrderController::class, 'success'])->name('orders.success');
     Route::get('/my-orders', [OrderController::class, 'history'])->name('orders.history');
     Route::get('/my-orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+    Route::patch('/my-orders/{id}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
     
     // Review Routes
     Route::post('/reviews/{bookId}', [ReviewController::class, 'store'])->name('reviews.store');
@@ -124,6 +125,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::patch('/orders/{id}/payment', [AdminOrderController::class, 'updatePaymentStatus'])->name('orders.update_payment');
     Route::get('/orders/{id}/invoice', [AdminOrderController::class, 'invoice'])->name('orders.invoice');
     Route::get('/orders-export', [AdminOrderController::class, 'export'])->name('orders.export');
+    Route::get('/orders/create', [AdminOrderController::class, 'create'])->name('orders.create');
+    Route::post('/orders', [AdminOrderController::class, 'store'])->name('orders.store');
     
     // Users Management
     Route::resource('users', AdminUserController::class);

@@ -149,4 +149,42 @@ class OrderController extends Controller
             
         return view('frontend.orders.show', compact('order'));
     }
+
+    /**
+     * Cancel an order.
+     */
+    public function cancel($id)
+    {
+        // Chỉ có thể hủy đơn hàng ở trạng thái 'pending'
+        $order = Order::where('user_id', Auth::id())
+            ->where('status', 'pending')
+            ->findOrFail($id);
+            
+        try {
+            DB::beginTransaction();
+            
+            // Cập nhật trạng thái đơn hàng
+            $order->status = 'cancelled';
+            $order->save();
+            
+            // Hoàn lại số lượng sách vào kho
+            foreach ($order->orderItems as $item) {
+                if ($item->book_id) {
+                    $book = Book::find($item->book_id);
+                    if ($book) {
+                        $book->stock += $item->quantity;
+                        $book->save();
+                    }
+                }
+            }
+            
+            DB::commit();
+            
+            return redirect()->route('orders.show', $id)->with('success', 'Đơn hàng đã được hủy thành công.');
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Đã xảy ra lỗi khi hủy đơn hàng. Vui lòng thử lại.');
+        }
+    }
 }
